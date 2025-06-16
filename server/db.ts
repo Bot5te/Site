@@ -1,6 +1,10 @@
 import { MongoClient, ServerApiVersion, Db } from 'mongodb';
 
-const uri = "mongodb+srv://Qassem77:01118723@cluster0.zbm9qua.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.MONGODB_URI || "mongodb+srv://Qassem77:01118723@cluster0.zbm9qua.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+if (!process.env.MONGODB_URI) {
+  console.warn("Warning: MONGODB_URI environment variable not set, using default URI");
+}
 
 const client = new MongoClient(uri, {
   serverApi: {
