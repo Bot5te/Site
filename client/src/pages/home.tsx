@@ -63,40 +63,25 @@ export default function Home({ onAdminLogin }: HomeProps) {
   return (
     <>
       {/* Header */}
-      <header className="bg-gradient-to-r from-gray-50 via-blue-50 to-gray-50 shadow-xl border-b border-blue-200">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row justify-between items-center py-8 lg:py-12 space-y-8 lg:space-y-0">
-            {/* Logo Section - Full Width on Mobile */}
-            <div className="flex items-center justify-center w-full lg:w-auto">
-              <div className="bg-white rounded-2xl shadow-lg p-4 border border-blue-100">
-                <img 
-                  src="@assets/Screenshot_٢٠٢٥٠٦١٦_١١١٠١١_Drive_1750061436030_1750089721030.jpg"
-                  alt="إنجاز وجدارة لإستقدام العمالة المنزلية" 
-                  className="h-20 sm:h-24 lg:h-28 xl:h-32 w-auto object-contain max-w-full" 
-                />
+          <div className="flex flex-col sm:flex-row justify-between items-center py-4 space-y-4 sm:space-y-0">
+            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+              <img 
+                src={logoSvg} 
+                alt="إنجاز وجدارة" 
+                className="h-12 w-24 object-contain" 
+              />
+              <div className="hidden sm:block">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">إنجاز وجدارة</h1>
+                <p className="text-xs sm:text-sm text-gray-600">لإستقدام العمالة المنزلية</p>
               </div>
             </div>
-            
-            {/* Stats and Controls */}
-            <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 rtl:space-x-reverse">
-              {/* Stats Card */}
-              <div className="bg-white rounded-xl px-6 py-4 shadow-lg border border-blue-100 backdrop-blur-sm">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 font-medium mb-1">إجمالي السير الذاتية</p>
-                  <p className="text-3xl font-bold text-blue-600">{counts.all}</p>
-                </div>
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+              <div className="text-center sm:text-right rtl:text-left">
+                <p className="text-sm text-gray-600">إجمالي السير الذاتية</p>
+                <p className="text-lg font-semibold text-primary">{counts.all}</p>
               </div>
-              
-              {/* Admin Button */}
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => setIsAdminLoginOpen(true)}
-                className="bg-white hover:bg-blue-50 border-blue-200 shadow-md hover:shadow-lg transition-all duration-300 px-6 py-3"
-              >
-                <Settings className="h-5 w-5 ml-2" />
-                <span className="font-medium">لوحة الإدارة</span>
-              </Button>
             </div>
           </div>
         </div>
