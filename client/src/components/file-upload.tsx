@@ -7,7 +7,7 @@ import { Upload, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface FileUploadProps {
-  onUpload: (data: { name: string; age: number; nationality: string }, file: File) => void;
+  onUpload: (data: { name: string; age: number; nationality: string; experience: string }, file: File) => void;
   isLoading: boolean;
 }
 
@@ -15,6 +15,7 @@ export function FileUpload({ onUpload, isLoading }: FileUploadProps) {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [nationality, setNationality] = useState("");
+  const [experience, setExperience] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -50,7 +51,7 @@ export function FileUpload({ onUpload, isLoading }: FileUploadProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !age || !nationality || !selectedFile) {
+    if (!name || !age || !nationality || !experience || !selectedFile) {
       toast({
         title: "بيانات ناقصة",
         description: "يرجى ملء جميع الحقول واختيار ملف",
@@ -69,12 +70,13 @@ export function FileUpload({ onUpload, isLoading }: FileUploadProps) {
       return;
     }
 
-    onUpload({ name, age: ageNum, nationality }, selectedFile);
+    onUpload({ name, age: ageNum, nationality, experience }, selectedFile);
     
     // Reset form
     setName("");
     setAge("");
     setNationality("");
+    setExperience("");
     setSelectedFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -126,6 +128,19 @@ export function FileUpload({ onUpload, isLoading }: FileUploadProps) {
                 <SelectItem value="kenya">كينيا</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="experience" className="text-right block mb-2">الخبرة</Label>
+            <Input
+              id="experience"
+              type="text"
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
+              placeholder="سنوات الخبرة أو نوع الخبرة"
+              required
+              className="text-right"
+            />
           </div>
         </div>
         

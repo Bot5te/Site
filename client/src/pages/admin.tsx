@@ -22,7 +22,7 @@ export default function Admin({ onClose }: AdminProps) {
   const [selectedCv, setSelectedCv] = useState<Cv | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editingCv, setEditingCv] = useState<Cv | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", age: "", nationality: "" });
+  const [editForm, setEditForm] = useState({ name: "", age: "", nationality: "", experience: "" });
 
   const { data: cvs = [], isLoading } = useCvs(filterNationality);
   const uploadCvMutation = useUploadCv();
@@ -30,7 +30,7 @@ export default function Admin({ onClose }: AdminProps) {
   const updateCvMutation = useUpdateCv();
   const { toast } = useToast();
 
-  const handleUpload = async (cvData: { name: string; age: number; nationality: string }, file: File) => {
+  const handleUpload = async (cvData: { name: string; age: number; nationality: string; experience: string }, file: File) => {
     try {
       await uploadCvMutation.mutateAsync({ cvData, file });
       toast({

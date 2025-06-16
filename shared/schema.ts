@@ -8,6 +8,7 @@ export const cvSchema = z.object({
   nationality: z.enum(["philippines", "ethiopia", "kenya"], {
     required_error: "Nationality is required"
   }),
+  experience: z.string().min(1, "Experience is required"),
   fileName: z.string().min(1, "File name is required"),
   fileType: z.enum(["pdf", "image"], {
     required_error: "File type is required"
