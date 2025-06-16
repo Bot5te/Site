@@ -37,5 +37,5 @@ export async function loginAdmin(password: string): Promise<{ success: boolean; 
 }
 
 export function getFileUrl(cv: Cv): string {
-  return `/api/files/${cv.filePath.split('/').pop()}`;
+  return `/api/files/${cv.id}`;
 }

@@ -22,10 +22,10 @@ This is a full-stack CV management system built for managing worker resumes from
 - **Build**: ESBuild for production bundling
 
 ### Data Storage
-- **Database**: PostgreSQL with Neon serverless driver (production ready)
-- **ORM**: Drizzle ORM with Zod for schema validation
-- **Data Persistence**: DatabaseStorage class with full CRUD operations
-- **File Storage**: Local filesystem in `uploads/` directory
+- **Database**: MongoDB Atlas cloud database (production ready)
+- **Schema Validation**: Zod schemas for type safety
+- **Data Persistence**: MongoStorage class with full CRUD operations
+- **File Storage**: Base64 encoded files stored directly in MongoDB (no filesystem dependency)
 
 ## Key Components
 
@@ -106,6 +106,9 @@ Changelog:
 - June 16, 2025. Implemented PostgreSQL database with Neon driver for data persistence
 - June 16, 2025. Enhanced mobile responsiveness across all components
 - June 16, 2025. Added custom logo and updated UI styling
+- June 16, 2025. Migrated from PostgreSQL to MongoDB Atlas for better scalability
+- June 16, 2025. Implemented Base64 file storage system (eliminates filesystem dependency)
+- June 16, 2025. Updated all API endpoints to work with MongoDB ObjectId system
 ```
 
 ## User Preferences

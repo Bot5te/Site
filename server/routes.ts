@@ -103,7 +103,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Update CV
   app.put("/api/cvs/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const { name, age, nationality } = req.body;
       
       const updateData: any = {};
@@ -126,18 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Delete CV
   app.delete("/api/cvs/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const cv = await storage.getCvById(id);
-      
-      if (!cv) {
-        return res.status(404).json({ message: "CV not found" });
-      }
-      
-      // Delete file from filesystem
-      if (fs.existsSync(cv.filePath)) {
-        fs.unlinkSync(cv.filePath);
-      }
-      
+      const id = req.params.id;
       const deleted = await storage.deleteCv(id);
       
       if (!deleted) {
@@ -150,15 +139,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded files
-  app.get("/api/files/:filename", (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.join(uploadsDir, filename);
-    
-    if (fs.existsSync(filePath)) {
-      res.sendFile(filePath);
-    } else {
-      res.status(404).json({ message: "File not found" });
+  // Serve files as Base64 data URLs
+  app.get("/api/files/:id", async (req, res) => {
+    try {
+      const id = req.params.id;
+      const cv = await storage.getCvById(id);
+      
+      if (!cv || !cv.fileData) {
+        return res.status(404).json({ message: "File not found" });
+      }
+
+      // Create data URL from Base64
+      const mimeType = cv.fileType === 'pdf' ? 'application/pdf' : 'image/jpeg';
+      const dataUrl = `data:${mimeType};base64,${cv.fileData}`;
+      
+      // For direct file serving, decode Base64 and send as buffer
+      const buffer = Buffer.from(cv.fileData, 'base64');
+      res.set({
+        'Content-Type': mimeType,
+        'Content-Length': buffer.length,
+        'Content-Disposition': `inline; filename="${cv.fileName}"`
+      });
+      res.send(buffer);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to serve file" });
     }
   });
 
