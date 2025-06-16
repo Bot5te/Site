@@ -70,6 +70,7 @@ export default function Admin({ onClose }: AdminProps) {
       name: cv.name,
       age: cv.age.toString(),
       nationality: cv.nationality,
+      experience: cv.experience,
     });
   };
 
@@ -84,6 +85,7 @@ export default function Admin({ onClose }: AdminProps) {
           name: editForm.name,
           age: parseInt(editForm.age),
           nationality: editForm.nationality,
+          experience: editForm.experience,
         },
       });
       setEditingCv(null);
