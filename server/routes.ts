@@ -69,10 +69,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const { name, age, nationality } = req.body;
+      const { name, age, nationality, experience } = req.body;
       
-      if (!name || !age || !nationality) {
-        return res.status(400).json({ message: "Name, age, and nationality are required" });
+      if (!name || !age || !nationality || !experience) {
+        return res.status(400).json({ message: "Name, age, nationality, and experience are required" });
       }
 
       // Convert file to Base64
@@ -82,6 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name,
         age: parseInt(age),
         nationality,
+        experience,
         fileName: req.file.originalname,
         fileType: req.file.mimetype.includes('pdf') ? 'pdf' : 'image',
         fileData,
