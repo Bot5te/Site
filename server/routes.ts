@@ -3,35 +3,17 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertCvSchema } from "@shared/schema";
 import multer from "multer";
-import path from "path";
-import fs from "fs";
+import { connectToDatabase } from "./db";
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(process.cwd(), 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Configure multer for file uploads
-const storage_multer = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadsDir);
-  },
-  filename: (req, file, cb) => {
-    const timestamp = Date.now();
-    const sanitizedOriginalName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-    cb(null, `${timestamp}_${sanitizedOriginalName}`);
-  }
-});
-
+// Configure multer for memory storage (files will be stored as Base64 in MongoDB)
 const upload = multer({
-  storage: storage_multer,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     const allowedTypes = /jpeg|jpg|png|pdf/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = allowedTypes.test(file.originalname.toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
     
     if (mimetype && extname) {
@@ -43,6 +25,9 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize MongoDB connection
+  await connectToDatabase();
+
   // Get all CVs
   app.get("/api/cvs", async (req, res) => {
     try {
@@ -64,7 +49,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get CV by ID
   app.get("/api/cvs/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
       const cv = await storage.getCvById(id);
       
       if (!cv) {
@@ -78,7 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Upload CV
-  app.post("/api/cvs", upload.single('file'), async (req, res) => {
+  app.post("/api/cvs", upload.single('file'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
@@ -87,18 +72,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name, age, nationality } = req.body;
       
       if (!name || !age || !nationality) {
-        // Clean up uploaded file if validation fails
-        fs.unlinkSync(req.file.path);
         return res.status(400).json({ message: "Name, age, and nationality are required" });
       }
 
+      // Convert file to Base64
+      const fileData = req.file.buffer.toString('base64');
+      
       const cvData = {
         name,
         age: parseInt(age),
         nationality,
         fileName: req.file.originalname,
         fileType: req.file.mimetype.includes('pdf') ? 'pdf' : 'image',
-        filePath: req.file.path,
+        fileData,
       };
 
       const validatedData = insertCvSchema.parse(cvData);
@@ -106,11 +92,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(cv);
     } catch (error) {
-      // Clean up uploaded file if error occurs
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
-      
       if (error instanceof Error) {
         res.status(400).json({ message: error.message });
       } else {

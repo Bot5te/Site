@@ -1,36 +1,39 @@
-import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const cvs = pgTable("cvs", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  age: integer("age").notNull(),
-  nationality: text("nationality").notNull(),
-  fileName: text("file_name").notNull(),
-  fileType: text("file_type").notNull(),
-  filePath: text("file_path").notNull(),
-  uploadDate: timestamp("upload_date").defaultNow().notNull(),
+// CV Schema for MongoDB
+export const cvSchema = z.object({
+  _id: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  age: z.number().min(1, "Age must be at least 1").max(100, "Age must be at most 100"),
+  nationality: z.enum(["philippines", "ethiopia", "kenya"], {
+    required_error: "Nationality is required"
+  }),
+  fileName: z.string().min(1, "File name is required"),
+  fileType: z.enum(["pdf", "image"], {
+    required_error: "File type is required"
+  }),
+  fileData: z.string().min(1, "File data is required"), // Base64 encoded file
+  uploadDate: z.date().default(() => new Date()),
 });
 
-export const insertCvSchema = createInsertSchema(cvs).omit({
-  id: true,
+export const insertCvSchema = cvSchema.omit({
+  _id: true,
   uploadDate: true,
 });
 
 export type InsertCv = z.infer<typeof insertCvSchema>;
-export type Cv = typeof cvs.$inferSelect;
+export type Cv = z.infer<typeof cvSchema> & { id: string };
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// User Schema for MongoDB
+export const userSchema = z.object({
+  _id: z.string().optional(),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+export const insertUserSchema = userSchema.omit({
+  _id: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export type User = z.infer<typeof userSchema> & { id: string };

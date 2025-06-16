@@ -1,15 +1,34 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "@shared/schema";
+import { MongoClient, ServerApiVersion, Db } from 'mongodb';
 
-neonConfig.webSocketConstructor = ws;
+const uri = "mongodb+srv://Qassem77:01118723@cluster0.zbm9qua.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
+
+let db: Db;
+
+export async function connectToDatabase() {
+  try {
+    await client.connect();
+    db = client.db("cv_management");
+    console.log("Connected to MongoDB successfully!");
+    return db;
+  } catch (error) {
+    console.error("Failed to connect to MongoDB:", error);
+    throw error;
+  }
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+export function getDatabase(): Db {
+  if (!db) {
+    throw new Error("Database not connected. Call connectToDatabase() first.");
+  }
+  return db;
+}
+
+export { client };
