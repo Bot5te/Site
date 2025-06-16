@@ -1,0 +1,41 @@
+import { apiRequest } from "./queryClient";
+import type { Cv, InsertCv } from "@shared/schema";
+
+export async function uploadCv(cvData: Omit<InsertCv, 'filePath' | 'fileName' | 'fileType'>, file: File): Promise<Cv> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('name', cvData.name);
+  formData.append('age', cvData.age.toString());
+  formData.append('nationality', cvData.nationality);
+
+  const response = await fetch('/api/cvs', {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to upload CV');
+  }
+
+  return response.json();
+}
+
+export async function updateCv(id: number, data: Partial<Pick<InsertCv, 'name' | 'age' | 'nationality'>>): Promise<Cv> {
+  const response = await apiRequest('PUT', `/api/cvs/${id}`, data);
+  return response.json();
+}
+
+export async function deleteCv(id: number): Promise<void> {
+  await apiRequest('DELETE', `/api/cvs/${id}`);
+}
+
+export async function loginAdmin(password: string): Promise<{ success: boolean; message: string }> {
+  const response = await apiRequest('POST', '/api/admin/login', { password });
+  return response.json();
+}
+
+export function getFileUrl(cv: Cv): string {
+  return `/api/files/${cv.filePath.split('/').pop()}`;
+}
