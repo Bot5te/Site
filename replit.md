@@ -97,6 +97,27 @@ This is a full-stack CV management system built for managing worker resumes from
 - **Deployment**: Autoscale with build/run commands
 - **Port Mapping**: 5000 → 80 for external access
 
+## Deployment on Render
+
+### Build Configuration
+- **Issue**: Vite build tools in devDependencies cause "vite: not found" error on Render
+- **Solution**: Created render.yaml with `npm install --include=dev` build command
+- **Alternative**: Custom build.sh script or manual Render dashboard configuration
+
+### Required Environment Variables
+- `MONGODB_URI`: MongoDB Atlas connection string
+- `NODE_ENV`: Set to "production"
+
+### Build Process  
+- Frontend: Vite builds React app to `dist/public/`
+- Backend: ESBuild bundles server to `dist/index.js`
+- Start command: `npm run start`
+
+### Files Created
+- `render.yaml`: Render service configuration
+- `build.sh`: Custom build script with proper dependency installation
+- `RENDER_DEPLOYMENT.md`: Complete deployment guide
+
 ## Changelog
 
 ```
@@ -109,6 +130,7 @@ Changelog:
 - June 16, 2025. Migrated from PostgreSQL to MongoDB Atlas for better scalability
 - June 16, 2025. Implemented Base64 file storage system (eliminates filesystem dependency)
 - June 16, 2025. Updated all API endpoints to work with MongoDB ObjectId system
+- June 16, 2025. Fixed Render deployment with proper build configuration for devDependencies
 ```
 
 ## User Preferences
