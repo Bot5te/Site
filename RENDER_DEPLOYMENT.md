@@ -1,43 +1,43 @@
-# Render Deployment Guide
+# Render Deployment Guide - CV Management System
 
-## Quick Fix for Build Error
+## Problem: "vite: not found" Build Error
 
-The "vite: not found" error occurs because Render only installs production dependencies by default. Here are the solutions:
+The error occurs because Render only installs production dependencies by default, but Vite and esbuild are in devDependencies.
 
-### Option 1: Using render.yaml (Recommended)
+## SOLUTION 1: Node.js Build Script (Most Reliable)
 
-Use the `render.yaml` file in your repository with this configuration:
+Use the custom Node.js build script:
 
-```yaml
-services:
-  - type: web
-    name: cv-management-app
-    env: node
-    buildCommand: npm install --include=dev && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
-    startCommand: npm run start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: MONGODB_URI
-        value: your-mongodb-connection-string
+**In Render Dashboard:**
+1. **Build Command**: `node build-render.js`
+2. **Start Command**: `npm run start`
+
+This script automatically:
+- Installs all dependencies including devDependencies
+- Builds frontend with npx vite build
+- Builds backend with npx esbuild
+- Verifies build outputs
+
+## SOLUTION 2: Manual Build Command
+
+**In Render Dashboard, set Build Command to:**
+```bash
+npm install --include=dev && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 ```
 
-### Option 2: Manual Render Dashboard Configuration
+**Start Command:**
+```bash
+npm run start
+```
 
-In your Render service settings:
+## SOLUTION 3: Bash Script
 
-1. **Build Command**: `npm install --include=dev && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist`
-2. **Start Command**: `npm run start`
-3. **Environment Variables**:
-   - `NODE_ENV` = `production`
-   - `MONGODB_URI` = your MongoDB connection string
+**Build Command:** `./build.sh`
+**Start Command:** `npm run start`
 
-### Option 3: Using Custom Build Script
+## SOLUTION 4: render.yaml (If supported)
 
-Use the included `build.sh` script:
-
-1. **Build Command**: `./build.sh`
-2. **Start Command**: `npm run start`
+The render.yaml file is included but may not be recognized by all Render configurations.
 
 ## Required Environment Variables
 
