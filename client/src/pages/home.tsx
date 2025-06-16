@@ -63,25 +63,34 @@ export default function Home({ onAdminLogin }: HomeProps) {
   return (
     <>
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-gradient-to-r from-blue-50 to-white shadow-lg border-b-2 border-blue-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-between items-center py-4 space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-6 sm:py-8 space-y-6 sm:space-y-0">
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
               <img 
                 src={logoSvg} 
                 alt="إنجاز وجدارة" 
-                className="h-12 w-24 object-contain" 
+                className="h-20 w-32 sm:h-24 sm:w-40 object-contain drop-shadow-md" 
               />
-              <div className="hidden sm:block">
-                <h1 className="text-lg sm:text-xl font-bold text-gray-900">إنجاز وجدارة</h1>
-                <p className="text-xs sm:text-sm text-gray-600">لإستقدام العمالة المنزلية</p>
+              <div className="text-center sm:text-right">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">إنجاز وجدارة</h1>
+                <p className="text-sm sm:text-base lg:text-lg text-gray-600 font-medium">لإستقدام العمالة المنزلية</p>
+                <p className="text-xs sm:text-sm text-blue-600 mt-1">خدمة موثوقة ومتميزة</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4 rtl:space-x-reverse">
-              <div className="text-center sm:text-right rtl:text-left">
-                <p className="text-sm text-gray-600">إجمالي السير الذاتية</p>
-                <p className="text-lg font-semibold text-primary">{counts.all}</p>
+            <div className="flex items-center space-x-6 rtl:space-x-reverse">
+              <div className="text-center bg-white rounded-lg px-4 py-3 shadow-md border border-blue-100">
+                <p className="text-sm text-gray-600 mb-1">إجمالي السير الذاتية</p>
+                <p className="text-2xl font-bold text-blue-600">{counts.all}</p>
               </div>
+              <Button
+                onClick={() => setIsAdminLoginOpen(true)}
+                variant="outline"
+                className="hidden sm:flex items-center gap-2 border-blue-200 text-blue-600 hover:bg-blue-50"
+              >
+                <Settings className="w-4 h-4" />
+                إدارة
+              </Button>
             </div>
           </div>
         </div>

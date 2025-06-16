@@ -27,7 +27,7 @@ export function useUploadCv() {
   
   return useMutation({
     mutationFn: ({ cvData, file }: { 
-      cvData: { name: string; age: number; nationality: string }; 
+      cvData: { name: string; age: number; nationality: string; experience: string }; 
       file: File 
     }) => uploadCv(cvData, file),
     onSuccess: () => {
@@ -41,8 +41,8 @@ export function useUpdateCv() {
   
   return useMutation({
     mutationFn: ({ id, data }: { 
-      id: number; 
-      data: Partial<{ name: string; age: number; nationality: string }> 
+      id: string; 
+      data: Partial<{ name: string; age: number; nationality: string; experience: string }> 
     }) => updateCv(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/cvs'] });
@@ -54,7 +54,7 @@ export function useDeleteCv() {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: (id: number) => deleteCv(id),
+    mutationFn: (id: string) => deleteCv(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/cvs'] });
     },

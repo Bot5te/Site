@@ -78,6 +78,12 @@ export function CvCard({ cv, onPreview }: CvCardProps) {
           </div>
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1">
+              💼 الخبرة:
+            </span>
+            <span>{cv.experience}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1">
               🕒 تاريخ الرفع:
             </span>
             <span>{new Date(cv.uploadDate).toLocaleDateString('ar-SA')}</span>
