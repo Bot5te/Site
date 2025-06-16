@@ -118,17 +118,22 @@ export default function Admin({ onClose }: AdminProps) {
     <>
       <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
-          <DialogHeader className="border-b pb-4 bg-primary text-white p-6 -m-6 mb-6">
+          <DialogHeader className="border-b pb-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 -m-6 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                <Settings className="w-6 h-6" />
-                <DialogTitle className="text-lg font-semibold">لوحة التحكم</DialogTitle>
+                <div className="bg-white/20 rounded-lg p-2">
+                  <Settings className="w-6 h-6" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-bold">لوحة إدارة إنجاز وجدارة</DialogTitle>
+                  <p className="text-blue-100 text-sm">إدارة السير الذاتية والعمالة المنزلية</p>
+                </div>
               </div>
               <Button 
                 onClick={onClose} 
                 variant="ghost" 
                 size="icon" 
-                className="text-white hover:bg-primary-dark"
+                className="text-white hover:bg-white/20 rounded-lg"
               >
                 <X className="w-6 h-6" />
               </Button>
