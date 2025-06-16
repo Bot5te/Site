@@ -9,7 +9,7 @@ The error occurs because Render only installs production dependencies by default
 Use the custom Node.js build script:
 
 **In Render Dashboard:**
-1. **Build Command**: `node build-render.js`
+1. **Build Command**: `node build-render.cjs`
 2. **Start Command**: `npm run start`
 
 This script automatically:
