@@ -13,7 +13,7 @@ services:
   - type: web
     name: cv-management-app
     env: node
-    buildCommand: npm install --include=dev && npm run build
+    buildCommand: npm install --include=dev && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
@@ -26,7 +26,7 @@ services:
 
 In your Render service settings:
 
-1. **Build Command**: `npm install --include=dev && npm run build`
+1. **Build Command**: `npm install --include=dev && npx vite build && npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist`
 2. **Start Command**: `npm run start`
 3. **Environment Variables**:
    - `NODE_ENV` = `production`
