@@ -22,9 +22,9 @@ This is a full-stack CV management system built for managing worker resumes from
 - **Build**: ESBuild for production bundling
 
 ### Data Storage
-- **Database**: PostgreSQL (configured for use with Neon)
+- **Database**: PostgreSQL with Neon serverless driver (production ready)
 - **ORM**: Drizzle ORM with Zod for schema validation
-- **Session Storage**: In-memory storage (MemStorage class) for development
+- **Data Persistence**: DatabaseStorage class with full CRUD operations
 - **File Storage**: Local filesystem in `uploads/` directory
 
 ## Key Components
@@ -102,6 +102,10 @@ This is a full-stack CV management system built for managing worker resumes from
 ```
 Changelog:
 - June 16, 2025. Initial setup
+- June 16, 2025. Updated branding to "إنجاز وجدارة لإستقدام العمالة المنزلية"
+- June 16, 2025. Implemented PostgreSQL database with Neon driver for data persistence
+- June 16, 2025. Enhanced mobile responsiveness across all components
+- June 16, 2025. Added custom logo and updated UI styling
 ```
 
 ## User Preferences

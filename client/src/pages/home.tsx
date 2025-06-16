@@ -114,24 +114,24 @@ export default function Home({ onAdminLogin }: HomeProps) {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search and Filter */}
-        <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div className="mb-6 sm:mb-8 flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex-1 max-w-lg">
             <div className="relative">
               <div className="absolute inset-y-0 right-0 rtl:left-0 rtl:right-auto pl-3 rtl:pr-3 rtl:pl-0 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
               <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 rtl:pl-10 rtl:pr-3 text-right"
+                className="pr-8 sm:pr-10 rtl:pl-8 sm:rtl:pl-10 rtl:pr-3 text-right text-sm sm:text-base"
                 placeholder="البحث في السير الذاتية..."
               />
             </div>
           </div>
-          <div className="flex space-x-3 rtl:space-x-reverse">
+          <div className="flex space-x-2 sm:space-x-3 rtl:space-x-reverse">
             <Select defaultValue="date">
-              <SelectTrigger className="w-40">
+              <SelectTrigger className="w-32 sm:w-40 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -140,8 +140,8 @@ export default function Home({ onAdminLogin }: HomeProps) {
                 <SelectItem value="age">ترتيب حسب العمر</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="bg-primary hover:bg-primary/90">
-              <Filter className="w-4 h-4 ml-1" />
+            <Button className="bg-primary hover:bg-primary/90 text-xs sm:text-sm px-3 sm:px-4">
+              <Filter className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
               فلترة
             </Button>
           </div>
@@ -149,38 +149,38 @@ export default function Home({ onAdminLogin }: HomeProps) {
 
         {/* CV Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-pulse">
-                <div className="w-full h-48 bg-gray-200" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="space-y-2">
-                    <div className="h-3 bg-gray-200 rounded" />
-                    <div className="h-3 bg-gray-200 rounded" />
-                    <div className="h-3 bg-gray-200 rounded" />
+                <div className="w-full h-32 sm:h-48 bg-gray-200" />
+                <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="space-y-1 sm:space-y-2">
+                    <div className="h-2 sm:h-3 bg-gray-200 rounded" />
+                    <div className="h-2 sm:h-3 bg-gray-200 rounded" />
+                    <div className="h-2 sm:h-3 bg-gray-200 rounded" />
                   </div>
                   <div className="flex gap-2">
-                    <div className="flex-1 h-8 bg-gray-200 rounded" />
-                    <div className="h-8 w-12 bg-gray-200 rounded" />
+                    <div className="flex-1 h-6 sm:h-8 bg-gray-200 rounded" />
+                    <div className="h-6 sm:h-8 w-8 sm:w-12 bg-gray-200 rounded" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : filteredCvs.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {filteredCvs.map((cv) => (
               <CvCard key={cv.id} cv={cv} onPreview={handlePreview} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="mx-auto h-24 w-24 text-gray-400 mb-4">
+          <div className="text-center py-8 sm:py-12">
+            <div className="mx-auto h-16 w-16 sm:h-24 sm:w-24 text-gray-400 mb-4">
               <FolderOpen className="w-full h-full" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد سير ذاتية</h3>
-            <p className="text-gray-500">
+            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">لا توجد سير ذاتية</h3>
+            <p className="text-sm sm:text-base text-gray-500 px-4">
               {searchQuery 
                 ? "لا توجد نتائج تطابق البحث الحالي"
                 : "لا توجد سير ذاتية متاحة لهذه الجنسية حاليًا"
@@ -193,10 +193,10 @@ export default function Home({ onAdminLogin }: HomeProps) {
       {/* Admin Panel Button */}
       <Button 
         onClick={() => setIsAdminLoginOpen(true)}
-        className="fixed bottom-5 left-5 rtl:right-5 rtl:left-auto bg-gray-800 text-white hover:bg-gray-700 rounded-full p-3 shadow-lg z-50"
+        className="fixed bottom-4 sm:bottom-5 left-4 sm:left-5 rtl:right-4 sm:rtl:right-5 rtl:left-auto bg-gray-800 text-white hover:bg-gray-700 rounded-full p-2 sm:p-3 shadow-lg z-50"
         size="icon"
       >
-        <Settings className="w-6 h-6" />
+        <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
       </Button>
 
       {/* Modals */}

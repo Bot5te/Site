@@ -113,3 +113,30 @@
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground));
 }
+
+/* Mobile Responsive Improvements */
+@media (max-width: 640px) {
+  .cv-card {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Better touch targets for mobile */
+  button {
+    min-height: 44px;
+  }
+  
+  /* Improved tab scrolling */
+  nav {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better mobile text */
+  h1 {
+    font-size: 1.25rem;
+  }
+  
+  /* Compact spacing */
+  .space-y-4 > * + * {
+    margin-top: 0.75rem;
+  }
+}
