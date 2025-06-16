@@ -1,4 +1,6 @@
-import { cvs, type Cv, type InsertCv, users, type User, type InsertUser } from "@shared/schema";
+import { users, type User, type InsertUser, cvs, type Cv, type InsertCv } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -15,82 +17,61 @@ export interface IStorage {
   deleteCv(id: number): Promise<boolean>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private cvs: Map<number, Cv>;
-  private currentUserId: number;
-  private currentCvId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.cvs = new Map();
-    this.currentUserId = 1;
-    this.currentCvId = 1;
-  }
-
-  // User methods
+export class DatabaseStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
-  // CV methods
   async getAllCvs(): Promise<Cv[]> {
-    return Array.from(this.cvs.values()).sort((a, b) => 
-      new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime()
-    );
+    return await db.select().from(cvs).orderBy(desc(cvs.uploadDate));
   }
 
   async getCvsByNationality(nationality: string): Promise<Cv[]> {
-    return Array.from(this.cvs.values())
-      .filter(cv => cv.nationality === nationality)
-      .sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime());
+    return await db.select().from(cvs)
+      .where(eq(cvs.nationality, nationality))
+      .orderBy(desc(cvs.uploadDate));
   }
 
   async getCvById(id: number): Promise<Cv | undefined> {
-    return this.cvs.get(id);
+    const [cv] = await db.select().from(cvs).where(eq(cvs.id, id));
+    return cv || undefined;
   }
 
   async createCv(insertCv: InsertCv): Promise<Cv> {
-    const id = this.currentCvId++;
-    const cv: Cv = {
-      ...insertCv,
-      id,
-      uploadDate: new Date(),
-    };
-    this.cvs.set(id, cv);
+    const [cv] = await db
+      .insert(cvs)
+      .values(insertCv)
+      .returning();
     return cv;
   }
 
   async updateCv(id: number, updateData: Partial<InsertCv>): Promise<Cv | undefined> {
-    const existingCv = this.cvs.get(id);
-    if (!existingCv) {
-      return undefined;
-    }
-
-    const updatedCv: Cv = {
-      ...existingCv,
-      ...updateData,
-    };
-    this.cvs.set(id, updatedCv);
-    return updatedCv;
+    const [cv] = await db
+      .update(cvs)
+      .set(updateData)
+      .where(eq(cvs.id, id))
+      .returning();
+    return cv || undefined;
   }
 
   async deleteCv(id: number): Promise<boolean> {
-    return this.cvs.delete(id);
+    const result = await db.delete(cvs).where(eq(cvs.id, id));
+    return (result.rowCount ?? 0) > 0;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

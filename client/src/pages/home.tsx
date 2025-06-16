@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Search, Filter, FileText, FolderOpen } from "lucide-react";
+import { Settings, Search, Filter, FolderOpen } from "lucide-react";
 import { CvCard } from "@/components/cv-card";
 import { CvPreviewModal } from "@/components/cv-preview-modal";
 import { AdminLoginModal } from "@/components/admin-login-modal";
 import { useCvs } from "@/hooks/use-cvs";
 import type { Cv } from "@shared/schema";
+import logoSvg from "@/assets/logo.svg";
 
 interface HomeProps {
   onAdminLogin: () => void;
@@ -64,18 +65,20 @@ export default function Home({ onAdminLogin }: HomeProps) {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-4 space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
-              <div className="bg-primary text-white p-2 rounded-lg">
-                <FileText className="w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">نظام إدارة السير الذاتية</h1>
-                <p className="text-sm text-gray-600">CV Management System</p>
+              <img 
+                src={logoSvg} 
+                alt="إنجاز وجدارة" 
+                className="h-12 w-24 object-contain" 
+              />
+              <div className="hidden sm:block">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">إنجاز وجدارة</h1>
+                <p className="text-xs sm:text-sm text-gray-600">لإستقدام العمالة المنزلية</p>
               </div>
             </div>
             <div className="flex items-center space-x-4 rtl:space-x-reverse">
-              <div className="text-right rtl:text-left">
+              <div className="text-center sm:text-right rtl:text-left">
                 <p className="text-sm text-gray-600">إجمالي السير الذاتية</p>
                 <p className="text-lg font-semibold text-primary">{counts.all}</p>
               </div>
@@ -87,19 +90,19 @@ export default function Home({ onAdminLogin }: HomeProps) {
       {/* Nationality Tabs */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex space-x-8 rtl:space-x-reverse" aria-label="Tabs">
+          <nav className="flex flex-wrap space-x-4 sm:space-x-8 rtl:space-x-reverse overflow-x-auto" aria-label="Tabs">
             {nationalityTabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setSelectedNationality(tab.key)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
+                className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap transition-colors flex-shrink-0 ${
                   selectedNationality === tab.key
                     ? "border-primary text-primary"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 {tab.label}
-                <Badge variant="secondary" className="ml-2 rtl:mr-2 rtl:ml-0">
+                <Badge variant="secondary" className="ml-1 sm:ml-2 rtl:mr-1 sm:rtl:mr-2 rtl:ml-0 text-xs">
                   {tab.count}
                 </Badge>
               </button>

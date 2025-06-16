@@ -1,0 +1,24 @@
+<svg width="400" height="200" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect x="10" y="10" width="380" height="180" rx="20" fill="url(#gradient)" stroke="#2C5282" stroke-width="2"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3182CE;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2B77CB;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Checkmark/Success Icon -->
+  <path d="M80 100 L120 140 L180 80" stroke="white" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Circle around checkmark -->
+  <circle cx="130" cy="110" r="45" stroke="white" stroke-width="4" fill="none"/>
+  
+  <!-- Arabic Text - إنجاز وجدارة -->
+  <text x="350" y="120" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="black" text-anchor="end" dominant-baseline="middle">إنجاز وجدارة</text>
+  
+  <!-- English Subtitle -->
+  <text x="350" y="150" font-family="Arial, sans-serif" font-size="16" fill="#2B77CB" text-anchor="end" dominant-baseline="middle">لإستقدام العمالة المنزلية</text>
+</svg>
