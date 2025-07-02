@@ -131,6 +131,9 @@ Changelog:
 - June 16, 2025. Implemented Base64 file storage system (eliminates filesystem dependency)
 - June 16, 2025. Updated all API endpoints to work with MongoDB ObjectId system
 - June 16, 2025. Fixed Render deployment with proper build configuration for devDependencies
+- July 2, 2025. Fixed MongoDB memory limit exceeded error by migrating from Base64 to filesystem storage
+- July 2, 2025. Updated schema to use filePath instead of fileData for better memory efficiency
+- July 2, 2025. Implemented file saving to uploads directory with unique naming system
 ```
 
 ## User Preferences

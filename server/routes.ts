@@ -4,6 +4,9 @@ import { storage } from "./storage";
 import { insertCvSchema } from "@shared/schema";
 import multer from "multer";
 import { connectToDatabase } from "./db";
+import fs from "fs";
+import path from "path";
+import { nanoid } from "nanoid";
 
 // Configure multer for memory storage (files will be stored as Base64 in MongoDB)
 const upload = multer({
@@ -77,9 +80,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Save file to filesystem
-      const fs = require('fs');
-      const path = require('path');
-      const { nanoid } = require('nanoid');
       
       // Create uploads directory if it doesn't exist
       const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -167,8 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "File not found" });
       }
 
-      const fs = require('fs');
-      const path = require('path');
+
       
       const fullFilePath = path.join(process.cwd(), cv.filePath);
       

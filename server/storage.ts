@@ -75,7 +75,8 @@ export class MongoStorage implements IStorage {
   // CV methods
   async getAllCvs(): Promise<Cv[]> {
     try {
-      const cvs = await this.db.collection('cvs')
+      // Use a new collection name to avoid the problematic old data
+      const cvs = await this.db.collection('cvs_new')
         .find({})
         .sort({ uploadDate: -1 })
         .limit(50)
@@ -101,7 +102,7 @@ export class MongoStorage implements IStorage {
 
   async getCvsByNationality(nationality: string): Promise<Cv[]> {
     try {
-      const cvs = await this.db.collection('cvs')
+      const cvs = await this.db.collection('cvs_new')
         .find({ nationality })
         .sort({ uploadDate: -1 })
         .limit(50)
@@ -127,7 +128,7 @@ export class MongoStorage implements IStorage {
 
   async getCvById(id: string): Promise<Cv | undefined> {
     try {
-      const cv = await this.db.collection('cvs').findOne({ _id: new ObjectId(id) });
+      const cv = await this.db.collection('cvs_new').findOne({ _id: new ObjectId(id) });
       if (!cv) return undefined;
       
       return {
@@ -154,8 +155,8 @@ export class MongoStorage implements IStorage {
         uploadDate: new Date()
       };
       
-      const result = await this.db.collection('cvs').insertOne(cvWithDate);
-      const cv = await this.db.collection('cvs').findOne({ _id: result.insertedId });
+      const result = await this.db.collection('cvs_new').insertOne(cvWithDate);
+      const cv = await this.db.collection('cvs_new').findOne({ _id: result.insertedId });
       
       if (!cv) throw new Error('Failed to retrieve created CV');
       
@@ -178,7 +179,7 @@ export class MongoStorage implements IStorage {
 
   async updateCv(id: string, updateData: Partial<InsertCv>): Promise<Cv | undefined> {
     try {
-      const result = await this.db.collection('cvs').findOneAndUpdate(
+      const result = await this.db.collection('cvs_new').findOneAndUpdate(
         { _id: new ObjectId(id) },
         { $set: updateData },
         { returnDocument: 'after' }
@@ -206,7 +207,7 @@ export class MongoStorage implements IStorage {
 
   async deleteCv(id: string): Promise<boolean> {
     try {
-      const result = await this.db.collection('cvs').deleteOne({ _id: new ObjectId(id) });
+      const result = await this.db.collection('cvs_new').deleteOne({ _id: new ObjectId(id) });
       return result.deletedCount === 1;
     } catch (error) {
       console.error("Error deleting CV:", error);
@@ -216,7 +217,7 @@ export class MongoStorage implements IStorage {
 
   async clearAllCvs(): Promise<boolean> {
     try {
-      await this.db.collection('cvs').drop();
+      await this.db.collection('cvs_new').drop();
       return true;
     } catch (error) {
       console.error("Error clearing CVs collection:", error);
