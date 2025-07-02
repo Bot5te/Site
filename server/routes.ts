@@ -42,7 +42,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(cvs);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch CVs" });
+      console.error("Error fetching CVs:", error);
+      res.status(500).json({ message: "Failed to fetch CVs", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
@@ -75,8 +76,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Name, age, nationality, and experience are required" });
       }
 
-      // Convert file to Base64
-      const fileData = req.file.buffer.toString('base64');
+      // Save file to filesystem
+      const fs = require('fs');
+      const path = require('path');
+      const { nanoid } = require('nanoid');
+      
+      // Create uploads directory if it doesn't exist
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // Generate unique filename
+      const fileExtension = path.extname(req.file.originalname);
+      const uniqueFileName = `${nanoid()}_${Date.now()}${fileExtension}`;
+      const filePath = path.join(uploadsDir, uniqueFileName);
+      
+      // Save file to disk
+      fs.writeFileSync(filePath, req.file.buffer);
       
       const cvData = {
         name,
@@ -85,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         experience,
         fileName: req.file.originalname,
         fileType: req.file.mimetype.includes('pdf') ? 'pdf' : 'image',
-        fileData,
+        filePath: `uploads/${uniqueFileName}`,
       };
 
       const validatedData = insertCvSchema.parse(cvData);
@@ -140,29 +157,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve files as Base64 data URLs
+  // Serve files from filesystem
   app.get("/api/files/:id", async (req, res) => {
     try {
       const id = req.params.id;
       const cv = await storage.getCvById(id);
       
-      if (!cv || !cv.fileData) {
+      if (!cv || !cv.filePath) {
         return res.status(404).json({ message: "File not found" });
       }
 
-      // Create data URL from Base64
-      const mimeType = cv.fileType === 'pdf' ? 'application/pdf' : 'image/jpeg';
-      const dataUrl = `data:${mimeType};base64,${cv.fileData}`;
+      const fs = require('fs');
+      const path = require('path');
       
-      // For direct file serving, decode Base64 and send as buffer
-      const buffer = Buffer.from(cv.fileData, 'base64');
+      const fullFilePath = path.join(process.cwd(), cv.filePath);
+      
+      // Check if file exists
+      if (!fs.existsSync(fullFilePath)) {
+        return res.status(404).json({ message: "File not found on disk" });
+      }
+
+      const mimeType = cv.fileType === 'pdf' ? 'application/pdf' : 'image/jpeg';
+      
       res.set({
         'Content-Type': mimeType,
-        'Content-Length': buffer.length,
         'Content-Disposition': `inline; filename="${cv.fileName}"`
       });
-      res.send(buffer);
+      
+      // Stream the file
+      const fileStream = fs.createReadStream(fullFilePath);
+      fileStream.pipe(res);
+      
     } catch (error) {
+      console.error("Error serving file:", error);
       res.status(500).json({ message: "Failed to serve file" });
     }
   });

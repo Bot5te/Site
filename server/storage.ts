@@ -1,6 +1,6 @@
-import { type User, type InsertUser, type Cv, type InsertCv } from "@shared/schema";
-import { getDatabase } from "./db";
-import { ObjectId } from "mongodb";
+import { MongoClient, Db, ObjectId } from 'mongodb';
+import { getDatabase } from './db.js';
+import type { User, Cv, InsertUser, InsertCv } from '../shared/schema.js';
 
 export interface IStorage {
   // User methods
@@ -15,6 +15,7 @@ export interface IStorage {
   createCv(cv: InsertCv): Promise<Cv>;
   updateCv(id: string, cv: Partial<InsertCv>): Promise<Cv | undefined>;
   deleteCv(id: string): Promise<boolean>;
+  clearAllCvs(): Promise<boolean>;
 }
 
 export class MongoStorage implements IStorage {
@@ -27,7 +28,8 @@ export class MongoStorage implements IStorage {
     try {
       const user = await this.db.collection('users').findOne({ _id: new ObjectId(id) });
       if (!user) return undefined;
-      return { 
+      
+      return {
         id: user._id.toString(),
         username: user.username,
         password: user.password,
@@ -39,73 +41,95 @@ export class MongoStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const user = await this.db.collection('users').findOne({ username });
-    if (!user) return undefined;
-    return { 
-      id: user._id.toString(),
-      username: user.username,
-      password: user.password,
-      _id: user._id.toString()
-    };
+    try {
+      const user = await this.db.collection('users').findOne({ username });
+      if (!user) return undefined;
+      
+      return {
+        id: user._id.toString(),
+        username: user.username,
+        password: user.password,
+        _id: user._id.toString()
+      };
+    } catch (error) {
+      return undefined;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const result = await this.db.collection('users').insertOne(insertUser);
-    const user = await this.db.collection('users').findOne({ _id: result.insertedId });
-    if (!user) throw new Error("Failed to create user");
-    return { 
-      id: user._id.toString(),
-      username: user.username,
-      password: user.password,
-      _id: user._id.toString()
-    };
+    try {
+      const result = await this.db.collection('users').insertOne(insertUser);
+      const user = await this.db.collection('users').findOne({ _id: result.insertedId });
+      
+      return {
+        id: user!._id.toString(),
+        username: user!.username,
+        password: user!.password,
+        _id: user!._id.toString()
+      };
+    } catch (error) {
+      throw new Error('Failed to create user');
+    }
   }
 
   // CV methods
   async getAllCvs(): Promise<Cv[]> {
-    const cvs = await this.db.collection('cvs')
-      .find({})
-      .sort({ uploadDate: -1 })
-      .toArray();
-    
-    return cvs.map(cv => ({
-      id: cv._id.toString(),
-      name: cv.name,
-      age: cv.age,
-      nationality: cv.nationality,
-      experience: cv.experience || "غير محدد",
-      fileName: cv.fileName,
-      fileType: cv.fileType,
-      fileData: cv.fileData,
-      uploadDate: cv.uploadDate || new Date(),
-      _id: cv._id.toString()
-    }));
+    try {
+      const cvs = await this.db.collection('cvs')
+        .find({})
+        .sort({ uploadDate: -1 })
+        .limit(50)
+        .toArray();
+      
+      return cvs.map(cv => ({
+        id: cv._id.toString(),
+        name: cv.name,
+        age: cv.age,
+        nationality: cv.nationality,
+        experience: cv.experience || "غير محدد",
+        fileName: cv.fileName,
+        fileType: cv.fileType,
+        filePath: cv.filePath || "",
+        uploadDate: cv.uploadDate || new Date(),
+        _id: cv._id.toString()
+      }));
+    } catch (error) {
+      console.error("Error in getAllCvs:", error);
+      return [];
+    }
   }
 
   async getCvsByNationality(nationality: string): Promise<Cv[]> {
-    const cvs = await this.db.collection('cvs')
-      .find({ nationality })
-      .sort({ uploadDate: -1 })
-      .toArray();
-    
-    return cvs.map(cv => ({
-      id: cv._id.toString(),
-      name: cv.name,
-      age: cv.age,
-      nationality: cv.nationality,
-      experience: cv.experience || "غير محدد",
-      fileName: cv.fileName,
-      fileType: cv.fileType,
-      fileData: cv.fileData,
-      uploadDate: cv.uploadDate || new Date(),
-      _id: cv._id.toString()
-    }));
+    try {
+      const cvs = await this.db.collection('cvs')
+        .find({ nationality })
+        .sort({ uploadDate: -1 })
+        .limit(50)
+        .toArray();
+      
+      return cvs.map(cv => ({
+        id: cv._id.toString(),
+        name: cv.name,
+        age: cv.age,
+        nationality: cv.nationality,
+        experience: cv.experience || "غير محدد",
+        fileName: cv.fileName,
+        fileType: cv.fileType,
+        filePath: cv.filePath || "",
+        uploadDate: cv.uploadDate || new Date(),
+        _id: cv._id.toString()
+      }));
+    } catch (error) {
+      console.error("Error in getCvsByNationality:", error);
+      return [];
+    }
   }
 
   async getCvById(id: string): Promise<Cv | undefined> {
     try {
       const cv = await this.db.collection('cvs').findOne({ _id: new ObjectId(id) });
       if (!cv) return undefined;
+      
       return {
         id: cv._id.toString(),
         name: cv.name,
@@ -114,7 +138,7 @@ export class MongoStorage implements IStorage {
         experience: cv.experience || "غير محدد",
         fileName: cv.fileName,
         fileType: cv.fileType,
-        fileData: cv.fileData,
+        filePath: cv.filePath || "",
         uploadDate: cv.uploadDate || new Date(),
         _id: cv._id.toString()
       };
@@ -124,27 +148,32 @@ export class MongoStorage implements IStorage {
   }
 
   async createCv(insertCv: InsertCv): Promise<Cv> {
-    const cvWithDate = {
-      ...insertCv,
-      uploadDate: new Date()
-    };
-    
-    const result = await this.db.collection('cvs').insertOne(cvWithDate);
-    const cv = await this.db.collection('cvs').findOne({ _id: result.insertedId });
-    if (!cv) throw new Error("Failed to create CV");
-    
-    return {
-      id: cv._id.toString(),
-      name: cv.name,
-      age: cv.age,
-      nationality: cv.nationality,
-      experience: cv.experience || "غير محدد",
-      fileName: cv.fileName,
-      fileType: cv.fileType,
-      fileData: cv.fileData,
-      uploadDate: cv.uploadDate || new Date(),
-      _id: cv._id.toString()
-    };
+    try {
+      const cvWithDate = {
+        ...insertCv,
+        uploadDate: new Date()
+      };
+      
+      const result = await this.db.collection('cvs').insertOne(cvWithDate);
+      const cv = await this.db.collection('cvs').findOne({ _id: result.insertedId });
+      
+      if (!cv) throw new Error('Failed to retrieve created CV');
+      
+      return {
+        id: cv._id.toString(),
+        name: cv.name,
+        age: cv.age,
+        nationality: cv.nationality,
+        experience: cv.experience || "غير محدد",
+        fileName: cv.fileName,
+        fileType: cv.fileType,
+        filePath: cv.filePath || "",
+        uploadDate: cv.uploadDate || new Date(),
+        _id: cv._id.toString()
+      };
+    } catch (error) {
+      throw new Error('Failed to create CV');
+    }
   }
 
   async updateCv(id: string, updateData: Partial<InsertCv>): Promise<Cv | undefined> {
@@ -155,21 +184,22 @@ export class MongoStorage implements IStorage {
         { returnDocument: 'after' }
       );
       
-      if (!result || !result.value) return undefined;
+      if (!result) return undefined;
       
       return {
-        id: result.value._id.toString(),
-        name: result.value.name,
-        age: result.value.age,
-        nationality: result.value.nationality,
-        experience: result.value.experience || "غير محدد",
-        fileName: result.value.fileName,
-        fileType: result.value.fileType,
-        fileData: result.value.fileData,
-        uploadDate: result.value.uploadDate || new Date(),
-        _id: result.value._id.toString()
+        id: result._id.toString(),
+        name: result.name,
+        age: result.age,
+        nationality: result.nationality,
+        experience: result.experience || "غير محدد",
+        fileName: result.fileName,
+        fileType: result.fileType,
+        filePath: result.filePath || "",
+        uploadDate: result.uploadDate || new Date(),
+        _id: result._id.toString()
       };
     } catch (error) {
+      console.error("Error updating CV:", error);
       return undefined;
     }
   }
@@ -177,8 +207,19 @@ export class MongoStorage implements IStorage {
   async deleteCv(id: string): Promise<boolean> {
     try {
       const result = await this.db.collection('cvs').deleteOne({ _id: new ObjectId(id) });
-      return result.deletedCount > 0;
+      return result.deletedCount === 1;
     } catch (error) {
+      console.error("Error deleting CV:", error);
+      return false;
+    }
+  }
+
+  async clearAllCvs(): Promise<boolean> {
+    try {
+      await this.db.collection('cvs').drop();
+      return true;
+    } catch (error) {
+      console.error("Error clearing CVs collection:", error);
       return false;
     }
   }
