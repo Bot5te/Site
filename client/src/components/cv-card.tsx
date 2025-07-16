@@ -2,12 +2,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, Download } from "lucide-react";
-import type { Cv } from "@shared/schema";
+import type { CvBasic } from "@shared/schema";
 import { getFileUrl } from "@/lib/api";
 
 interface CvCardProps {
-  cv: Cv;
-  onPreview: (cv: Cv) => void;
+  cv: CvBasic;
+  onPreview: (cv: CvBasic) => void;
 }
 
 const getNationalityFlag = (nationality: string) => {
@@ -39,15 +39,12 @@ export function CvCard({ cv, onPreview }: CvCardProps) {
   return (
     <Card className="cv-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
       <div className="relative">
-        <img 
-          src={getFileUrl(cv)} 
-          alt="CV Preview" 
-          className="w-full h-48 object-cover rounded-t-lg"
-          onError={(e) => {
-            // Fallback image for PDFs or broken images
-            (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f3f4f6'/%3E%3Ctext x='200' y='150' text-anchor='middle' dy='.3em' fill='%236b7280' font-family='Arial, sans-serif' font-size='16'%3ECV Preview%3C/text%3E%3C/svg%3E";
-          }}
-        />
+        <div className="w-full h-48 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-t-lg flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-4xl mb-2">{cv.fileType === 'pdf' ? '📄' : '🖼️'}</div>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{cv.fileName}</p>
+          </div>
+        </div>
         <div className="absolute top-2 left-2">
           <Badge variant={cv.fileType === 'pdf' ? 'destructive' : 'secondary'} className="text-xs">
             {cv.fileType === 'pdf' ? 'PDF' : 'صورة'}

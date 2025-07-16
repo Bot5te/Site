@@ -29,16 +29,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize MongoDB connection
   await connectToDatabase();
 
-  // Get all CVs
+  // Get all CVs (basic data only for performance)
   app.get("/api/cvs", async (req, res) => {
     try {
       const nationality = req.query.nationality as string;
       let cvs;
       
       if (nationality && nationality !== 'all') {
-        cvs = await storage.getCvsByNationality(nationality);
+        cvs = await storage.getCvsByNationalityBasic(nationality);
       } else {
-        cvs = await storage.getAllCvs();
+        cvs = await storage.getAllCvsBasic();
       }
       
       res.json(cvs);

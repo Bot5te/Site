@@ -12,6 +12,9 @@ export interface IStorage {
   getAllCvs(): Promise<Cv[]>;
   getCvsByNationality(nationality: string): Promise<Cv[]>;
   getCvById(id: string): Promise<Cv | undefined>;
+  // New methods for basic data only (without fileData)
+  getAllCvsBasic(): Promise<Omit<Cv, 'fileData'>[]>;
+  getCvsByNationalityBasic(nationality: string): Promise<Omit<Cv, 'fileData'>[]>;
   createCv(cv: InsertCv): Promise<Cv>;
   updateCv(id: string, cv: Partial<InsertCv>): Promise<Cv | undefined>;
   deleteCv(id: string): Promise<boolean>;
@@ -145,6 +148,57 @@ export class MongoStorage implements IStorage {
       };
     } catch (error) {
       return undefined;
+    }
+  }
+
+  // New methods for basic data only (without fileData for better performance)
+  async getAllCvsBasic(): Promise<Omit<Cv, 'fileData'>[]> {
+    try {
+      const cvs = await this.db.collection('cvs_new')
+        .find({}, { projection: { fileData: 0 } }) // Exclude fileData
+        .sort({ uploadDate: -1 })
+        .limit(50)
+        .toArray();
+      
+      return cvs.map(cv => ({
+        id: cv._id.toString(),
+        name: cv.name,
+        age: cv.age,
+        nationality: cv.nationality,
+        experience: cv.experience || "غير محدد",
+        fileName: cv.fileName,
+        fileType: cv.fileType,
+        uploadDate: cv.uploadDate || new Date(),
+        _id: cv._id.toString()
+      }));
+    } catch (error) {
+      console.error("Error in getAllCvsBasic:", error);
+      return [];
+    }
+  }
+
+  async getCvsByNationalityBasic(nationality: string): Promise<Omit<Cv, 'fileData'>[]> {
+    try {
+      const cvs = await this.db.collection('cvs_new')
+        .find({ nationality }, { projection: { fileData: 0 } }) // Exclude fileData
+        .sort({ uploadDate: -1 })
+        .limit(50)
+        .toArray();
+      
+      return cvs.map(cv => ({
+        id: cv._id.toString(),
+        name: cv.name,
+        age: cv.age,
+        nationality: cv.nationality,
+        experience: cv.experience || "غير محدد",
+        fileName: cv.fileName,
+        fileType: cv.fileType,
+        uploadDate: cv.uploadDate || new Date(),
+        _id: cv._id.toString()
+      }));
+    } catch (error) {
+      console.error("Error in getCvsByNationalityBasic:", error);
+      return [];
     }
   }
 

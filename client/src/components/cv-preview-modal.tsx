@@ -1,11 +1,11 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Share } from "lucide-react";
-import type { Cv } from "@shared/schema";
+import type { CvBasic } from "@shared/schema";
 import { getFileUrl } from "@/lib/api";
 
 interface CvPreviewModalProps {
-  cv: Cv | null;
+  cv: CvBasic | null;
   isOpen: boolean;
   onClose: () => void;
 }

@@ -8,7 +8,7 @@ import { CvCard } from "@/components/cv-card";
 import { CvPreviewModal } from "@/components/cv-preview-modal";
 import { AdminLoginModal } from "@/components/admin-login-modal";
 import { useCvs } from "@/hooks/use-cvs";
-import type { Cv } from "@shared/schema";
+import type { CvBasic } from "@shared/schema";
 import logoSvg from "@/assets/logo.svg";
 
 interface HomeProps {
@@ -18,7 +18,7 @@ interface HomeProps {
 export default function Home({ onAdminLogin }: HomeProps) {
   const [selectedNationality, setSelectedNationality] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCv, setSelectedCv] = useState<Cv | null>(null);
+  const [selectedCv, setSelectedCv] = useState<CvBasic | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isAdminLoginOpen, setIsAdminLoginOpen] = useState(false);
 
@@ -43,7 +43,7 @@ export default function Home({ onAdminLogin }: HomeProps) {
 
   const counts = getCounts();
 
-  const handlePreview = (cv: Cv) => {
+  const handlePreview = (cv: CvBasic) => {
     setSelectedCv(cv);
     setIsPreviewOpen(true);
   };

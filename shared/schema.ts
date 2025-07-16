@@ -24,6 +24,7 @@ export const insertCvSchema = cvSchema.omit({
 
 export type InsertCv = z.infer<typeof insertCvSchema>;
 export type Cv = z.infer<typeof cvSchema> & { id: string };
+export type CvBasic = Omit<Cv, 'fileData'>; // CV without file data for better performance
 
 // User Schema for MongoDB
 export const userSchema = z.object({

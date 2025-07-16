@@ -11,7 +11,7 @@ import { FileUpload } from "@/components/file-upload";
 import { CvPreviewModal } from "@/components/cv-preview-modal";
 import { useCvs, useUploadCv, useDeleteCv, useUpdateCv } from "@/hooks/use-cvs";
 import { useToast } from "@/hooks/use-toast";
-import type { Cv } from "@shared/schema";
+import type { Cv, CvBasic } from "@shared/schema";
 
 interface AdminProps {
   onClose: () => void;
@@ -19,7 +19,7 @@ interface AdminProps {
 
 export default function Admin({ onClose }: AdminProps) {
   const [filterNationality, setFilterNationality] = useState("all");
-  const [selectedCv, setSelectedCv] = useState<Cv | null>(null);
+  const [selectedCv, setSelectedCv] = useState<CvBasic | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editingCv, setEditingCv] = useState<Cv | null>(null);
   const [editForm, setEditForm] = useState({ name: "", age: "", nationality: "", experience: "" });
@@ -46,7 +46,7 @@ export default function Admin({ onClose }: AdminProps) {
     }
   };
 
-  const handleDelete = async (cv: Cv) => {
+  const handleDelete = async (cv: CvBasic) => {
     if (window.confirm(`هل أنت متأكد من حذف سيرة ${cv.name}؟`)) {
       try {
         await deleteCvMutation.mutateAsync(cv.id);
@@ -64,7 +64,7 @@ export default function Admin({ onClose }: AdminProps) {
     }
   };
 
-  const handleEdit = (cv: Cv) => {
+  const handleEdit = (cv: CvBasic) => {
     setEditingCv(cv);
     setEditForm({
       name: cv.name,
@@ -102,7 +102,7 @@ export default function Admin({ onClose }: AdminProps) {
     }
   };
 
-  const handlePreview = (cv: Cv) => {
+  const handlePreview = (cv: CvBasic) => {
     setSelectedCv(cv);
     setIsPreviewOpen(true);
   };

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Cv } from "@shared/schema";
+import type { Cv, CvBasic } from "@shared/schema";
 import { uploadCv, updateCv, deleteCv } from "@/lib/api";
 
 export function useCvs(nationality?: string) {
@@ -7,7 +7,7 @@ export function useCvs(nationality?: string) {
     ? ['/api/cvs', nationality] 
     : ['/api/cvs'];
     
-  return useQuery<Cv[]>({
+  return useQuery<CvBasic[]>({
     queryKey,
     queryFn: async () => {
       const url = nationality && nationality !== 'all' 
