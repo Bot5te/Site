@@ -26,6 +26,7 @@ This is a full-stack CV management system built for managing worker resumes from
 - **Schema Validation**: Zod schemas for type safety
 - **Data Persistence**: MongoStorage class with full CRUD operations
 - **File Storage**: Base64 encoded files stored directly in MongoDB (no filesystem dependency)
+- **Performance Optimizations**: Query projections exclude fileData from list operations, memory caching for file serving
 
 ## Key Components
 
@@ -37,7 +38,8 @@ This is a full-stack CV management system built for managing worker resumes from
 ### File Upload System
 - **Supported Formats**: PDF, JPEG, PNG
 - **File Size Limit**: 5MB per file
-- **Storage**: Local filesystem with timestamp-based naming
+- **Storage**: Base64 encoded files stored in MongoDB (production-ready, persistent)
+- **Performance**: File caching system with 30-minute cache duration
 - **Validation**: File type and size validation with error handling
 
 ### Authentication
@@ -134,6 +136,9 @@ Changelog:
 - July 2, 2025. Fixed MongoDB memory limit exceeded error by migrating from Base64 to filesystem storage
 - July 2, 2025. Updated schema to use filePath instead of fileData for better memory efficiency
 - July 2, 2025. Implemented file saving to uploads directory with unique naming system
+- July 16, 2025. Resolved file loss issue on hosting restart by migrating back to Base64 database storage
+- July 16, 2025. Implemented file caching system and query optimizations for better performance
+- July 16, 2025. Created new MongoDB collection 'cvs_base64' for proper fileData storage
 ```
 
 ## User Preferences
