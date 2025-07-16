@@ -4,8 +4,6 @@ import { storage } from "./storage";
 import { insertCvSchema } from "@shared/schema";
 import multer from "multer";
 import { connectToDatabase } from "./db";
-import fs from "fs";
-import path from "path";
 import { nanoid } from "nanoid";
 
 // Configure multer for memory storage (files will be stored as Base64 in MongoDB)
@@ -79,21 +77,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Name, age, nationality, and experience are required" });
       }
 
-      // Save file to filesystem
-      
-      // Create uploads directory if it doesn't exist
-      const uploadsDir = path.join(process.cwd(), 'uploads');
-      if (!fs.existsSync(uploadsDir)) {
-        fs.mkdirSync(uploadsDir, { recursive: true });
-      }
-      
-      // Generate unique filename
-      const fileExtension = path.extname(req.file.originalname);
-      const uniqueFileName = `${nanoid()}_${Date.now()}${fileExtension}`;
-      const filePath = path.join(uploadsDir, uniqueFileName);
-      
-      // Save file to disk
-      fs.writeFileSync(filePath, req.file.buffer);
+      // Convert file to Base64 for database storage
+      const fileData = req.file.buffer.toString('base64');
       
       const cvData = {
         name,
@@ -102,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         experience,
         fileName: req.file.originalname,
         fileType: req.file.mimetype.includes('pdf') ? 'pdf' : 'image',
-        filePath: `uploads/${uniqueFileName}`,
+        fileData,
       };
 
       const validatedData = insertCvSchema.parse(cvData);
@@ -157,25 +142,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve files from filesystem
+  // Serve files from database
   app.get("/api/files/:id", async (req, res) => {
     try {
       const id = req.params.id;
       const cv = await storage.getCvById(id);
       
-      if (!cv || !cv.filePath) {
+      if (!cv || !cv.fileData) {
         return res.status(404).json({ message: "File not found" });
       }
 
-
-      
-      const fullFilePath = path.join(process.cwd(), cv.filePath);
-      
-      // Check if file exists
-      if (!fs.existsSync(fullFilePath)) {
-        return res.status(404).json({ message: "File not found on disk" });
-      }
-
+      // Convert Base64 back to buffer
+      const fileBuffer = Buffer.from(cv.fileData, 'base64');
       const mimeType = cv.fileType === 'pdf' ? 'application/pdf' : 'image/jpeg';
       
       res.set({
@@ -183,9 +161,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'Content-Disposition': `inline; filename="${cv.fileName}"`
       });
       
-      // Stream the file
-      const fileStream = fs.createReadStream(fullFilePath);
-      fileStream.pipe(res);
+      // Send the file buffer
+      res.send(fileBuffer);
       
     } catch (error) {
       console.error("Error serving file:", error);

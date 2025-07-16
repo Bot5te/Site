@@ -90,7 +90,7 @@ export class MongoStorage implements IStorage {
         experience: cv.experience || "غير محدد",
         fileName: cv.fileName,
         fileType: cv.fileType,
-        filePath: cv.filePath || "",
+        fileData: cv.fileData || "",
         uploadDate: cv.uploadDate || new Date(),
         _id: cv._id.toString()
       }));
@@ -116,7 +116,7 @@ export class MongoStorage implements IStorage {
         experience: cv.experience || "غير محدد",
         fileName: cv.fileName,
         fileType: cv.fileType,
-        filePath: cv.filePath || "",
+        fileData: cv.fileData || "",
         uploadDate: cv.uploadDate || new Date(),
         _id: cv._id.toString()
       }));
@@ -139,7 +139,7 @@ export class MongoStorage implements IStorage {
         experience: cv.experience || "غير محدد",
         fileName: cv.fileName,
         fileType: cv.fileType,
-        filePath: cv.filePath || "",
+        fileData: cv.fileData || "",
         uploadDate: cv.uploadDate || new Date(),
         _id: cv._id.toString()
       };
@@ -168,7 +168,7 @@ export class MongoStorage implements IStorage {
         experience: cv.experience || "غير محدد",
         fileName: cv.fileName,
         fileType: cv.fileType,
-        filePath: cv.filePath || "",
+        fileData: cv.fileData || "",
         uploadDate: cv.uploadDate || new Date(),
         _id: cv._id.toString()
       };
@@ -195,7 +195,7 @@ export class MongoStorage implements IStorage {
         experience: result.experience || "غير محدد",
         fileName: result.fileName,
         fileType: result.fileType,
-        filePath: result.filePath || "",
+        fileData: result.fileData || "",
         uploadDate: result.uploadDate || new Date(),
         _id: result._id.toString()
       };

@@ -13,7 +13,7 @@ export const cvSchema = z.object({
   fileType: z.enum(["pdf", "image"], {
     required_error: "File type is required"
   }),
-  filePath: z.string().min(1, "File path is required"), // File path in uploads directory
+  fileData: z.string().min(1, "File data is required"), // Base64 encoded file data
   uploadDate: z.date().default(() => new Date()),
 });
 
