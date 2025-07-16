@@ -6,10 +6,6 @@ import multer from "multer";
 import { connectToDatabase } from "./db";
 import { nanoid } from "nanoid";
 
-// File cache to improve performance
-const fileCache = new Map<string, { buffer: Buffer; mimeType: string; timestamp: number }>();
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes
-
 // Configure multer for memory storage (files will be stored as Base64 in MongoDB)
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -146,21 +142,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve files from database with caching
+  // Serve files from database
   app.get("/api/files/:id", async (req, res) => {
     try {
       const id = req.params.id;
-      
-      // Check cache first
-      const cached = fileCache.get(id);
-      if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-        res.set({
-          'Content-Type': cached.mimeType,
-          'Content-Disposition': `inline; filename="cached_file"`
-        });
-        return res.send(cached.buffer);
-      }
-      
       const cv = await storage.getCvById(id);
       
       if (!cv || !cv.fileData) {
@@ -170,23 +155,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Convert Base64 back to buffer
       const fileBuffer = Buffer.from(cv.fileData, 'base64');
       const mimeType = cv.fileType === 'pdf' ? 'application/pdf' : 'image/jpeg';
-      
-      // Cache the file
-      fileCache.set(id, {
-        buffer: fileBuffer,
-        mimeType,
-        timestamp: Date.now()
-      });
-      
-      // Clean old cache entries occasionally
-      if (fileCache.size > 100) {
-        const now = Date.now();
-        for (const [key, value] of fileCache.entries()) {
-          if (now - value.timestamp > CACHE_DURATION) {
-            fileCache.delete(key);
-          }
-        }
-      }
       
       res.set({
         'Content-Type': mimeType,
